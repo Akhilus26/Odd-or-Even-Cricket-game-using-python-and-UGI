@@ -14,7 +14,8 @@ dict={
     "runs":{"user":0,"bot":0},
     "over":0,
     "wicket":0,
-    "wicket_count":{"bot":0,"user":0}
+    "wicket_count":{"bot":0, "user":0},
+    "target_run":{"bot":0, "user":0},
     }
 
 toss_list=[1,2,3,4,5,6]
@@ -48,6 +49,7 @@ def main_frame_destroyer():
 
 #-------------------ODD/EVEN Toss------------------------------#
 
+
 def win_decision():
     
     if dict["toss"]["user"]=="bat":
@@ -58,13 +60,16 @@ def win_decision():
             wining_secision_label=Label(user_ball_frame, text=f"Congratulations!, You Won The Match by {user_total_runs-bot_total_runs} runs",fg="red", font=('Times New Roman', 15))
             wining_secision_label.grid(row=14, column=0, columnspan=5, padx=10, pady=20)
             print(f"Congratulations!, You Won The Match by {user_total_runs-bot_total_runs} runs")
+
+    
+
         elif user_total_runs<bot_total_runs:
             total_wicket=dict["wicket_count"]["bot"]
             total_wicket_have=dict["wicket"]-total_wicket
             wining_secision_label=Label(user_ball_frame, text=f"bot won the match by {total_wicket_have} wickets, better luck Next time",fg="red", font=('Times New Roman', 15))
             wining_secision_label.grid(row=14, column=0, columnspan=5, padx=10, pady=20)
             print(f"bot won the match by {total_wicket_have} wickets, better luck Next time")
-        else:
+        elif user_total_runs == bot_total_runs:
             wining_secision_label=Label(user_ball_frame, text="draw",fg="red", font=('Times New Roman', 15))
             wining_secision_label.grid(row=14, column=0, columnspan=5, padx=10, pady=20)
             print("draw")
@@ -84,7 +89,7 @@ def win_decision():
             wining_secision_label=Label(user_bat_frame, text=f"bot won the match by {bot_total_runs-user_total_runs} runs",fg="red", font=('Times New Roman', 15))
             wining_secision_label.grid(row=14, column=0, columnspan=5, padx=10, pady=20)
             print(f"bot won the match by {bot_total_runs-user_total_runs} runs, better luck Next time")
-        else:
+        elif user_total_runs == bot_total_runs:
             wining_secision_label=Label(user_bat_frame, text="draw",fg="red", font=('Times New Roman', 15))
             wining_secision_label.grid(row=14, column=0, columnspan=5, padx=10, pady=20)
             print("draw")
@@ -95,21 +100,19 @@ user_ball_wicket_count=0
 
 
 def user_ball():
+    
     global user_ball_frame
+    target_run=dict["runs"]["user"] + 1
+    dict["target_run"]["bot"]=target_run
 
     def ball(ball_value):
-        print(ball_value)
-        global user_ball_count,user_ball_wicket_count,target_run
-        target_run=dict["runs"]["user"]
 
+        global user_ball_count,user_ball_wicket_count
+        
         over=dict["over"]
         total_balls=over*6
-        
         total_wicket=dict["wicket"]
-        
         total_runs=dict["runs"]["bot"]
-        print("total_target - ",target_run)
-
 
         user_ball_count += 1
         balls_left=total_balls - user_ball_count
@@ -129,11 +132,9 @@ def user_ball():
         bat_val_text.delete('1.0',END)
         bat_val_text.insert(END,bat_value)
         bat_val_text.configure(state=DISABLED)
-        print("bat val------", bat_value)
-        print('ball val----',ball_value)
 
         if bat_value == ball_value:
-            print("wicket")
+
             user_ball_wicket_count +=1
             wicket_left = total_wicket - user_ball_wicket_count
 
@@ -158,10 +159,10 @@ def user_ball():
                     win_decision()
                 elif dict["toss"]["user"]=="ball":
                     wicket_full_gone_label=Label(user_ball_frame, text=f"bot Batting is over, Your bot Score is {total_runs} \nYou need to chasse",fg="red", font=('Times New Roman', 15))
-                    wicket_full_gone_label.grid(row=13, column=0, columnspan=5, padx=10, pady=20)
+                    wicket_full_gone_label.grid(row=13, column=0, columnspan=5, padx=10, pady=10)
 
-                    batting_over_next_button=Button(user_ball_frame,text="Next",command=user_bat)
-                    batting_over_next_button.grid(row=14, column=0, columnspan=5, padx=10, pady=20)
+                    batting_over_next_button=Button(user_ball_frame,text="Next",command=user_bat, font=('Times New Roman', 15))
+                    batting_over_next_button.grid(row=14, column=0, columnspan=5, padx=10, pady=15)
                     
 
         elif balls_left+1 == 0:
@@ -189,14 +190,14 @@ def user_ball():
                     win_decision()
             elif dict["toss"]["user"]=="ball":
                     wicket_full_gone_label=Label(user_ball_frame, text=f"bot Batting is over, Your bot Score is {total_runs} \nYou need to chasse",fg="red", font=('Times New Roman', 15))
-                    wicket_full_gone_label.grid(row=13, column=0, columnspan=5, padx=10, pady=20)
+                    wicket_full_gone_label.grid(row=13, column=0, columnspan=5, padx=10, pady=10)
 
-                    batting_over_next_button=Button(user_ball_frame,text="Next",command=user_bat)
-                    batting_over_next_button.grid(row=14, column=0, columnspan=5, padx=10, pady=20)
+                    batting_over_next_button=Button(user_ball_frame,text="Next",command=user_bat, font=('Times New Roman', 15))
+                    batting_over_next_button.grid(row=14, column=0, columnspan=5, padx=10, pady=15)
                
 
         else:
-            print("elses")
+         
             if bat_value==0:
                 bat_value=ball_value
             total_runs += bat_value
@@ -209,9 +210,8 @@ def user_ball():
             dict["runs"]["bot"]=total_runs
             
             if dict["toss"]["user"]=="bat":
-                target_run=target_run-bat_value
-                print("Target ",target_run)
-                if target_run<=0:
+                dict["target_run"]["bot"] -= bat_value
+                if dict["target_run"]["bot"]<0:
                     win_decision()
                                               
 
@@ -224,10 +224,10 @@ def user_ball():
 
   #------------- bot score text -----------------------#
 
-    bot_score_label=Label(user_ball_frame, text="bot score", font=('Times New Roman', 12))
+    bot_score_label=Label(user_ball_frame, text="bot score", font=('Times New Roman', 14))
     bot_score_label.grid(row=1, column=0, padx=10)
 
-    bot_score_text=Text(user_ball_frame,state=DISABLED,height=1,width=5)
+    bot_score_text=Text(user_ball_frame,state=DISABLED,height=1,width=6, font=('Times New Roman', 14))
     bot_score_text.grid(row=2,column=0)
     
     #-----------------Target score text -------------------------#
@@ -239,7 +239,7 @@ def user_ball():
         bot_bat_target_label=Label(user_ball_frame, text="Target", font=('Times New Roman', 12))
         bot_bat_target_label.grid(row=1, column=4, padx=10)
 
-        bot_bat_target_text=Text(user_ball_frame,state=DISABLED,height=1,width=5)
+        bot_bat_target_text=Text(user_ball_frame,state=DISABLED,height=1,width=6)
         bot_bat_target_text.grid(row=2,column=4)
 
         bot_bat_target_text.configure(state=NORMAL)
@@ -254,10 +254,10 @@ def user_ball():
     over=dict["over"]
     total_balls=over*6
 
-    user_ball_count_label=Label(user_ball_frame,text="Balls left")
+    user_ball_count_label=Label(user_ball_frame,text="Balls left", font=('Times New Roman', 14))
     user_ball_count_label.grid(row=10, column=0, padx=10, pady=10)
 
-    user_ball_count_text=Text(user_ball_frame,state=DISABLED, height=1, width=5)
+    user_ball_count_text=Text(user_ball_frame,state=DISABLED, height=1, width=6, font=('Times New Roman', 12))
     user_ball_count_text.grid(row=11, column=0)
 
     user_ball_count_text.configure(state=NORMAL)
@@ -270,10 +270,10 @@ def user_ball():
 
     total_wicket=dict["wicket"]
 
-    wicket_count_label=Label(user_ball_frame,text="Wickets left")
+    wicket_count_label=Label(user_ball_frame,text="Wickets left", font=('Times New Roman', 14))
     wicket_count_label.grid(row=10, column=4, padx=10, pady=10)
 
-    wicket_count_text=Text(user_ball_frame,state=DISABLED, height=1, width=5)
+    wicket_count_text=Text(user_ball_frame,state=DISABLED, height=1, width=6, font=('Times New Roman', 12))
     wicket_count_text.grid(row=11, column=4)
 
     wicket_count_text.configure(state=NORMAL)
@@ -283,43 +283,43 @@ def user_ball():
 
     #-------------------batting score text --------------------#
 
-    you_are_balling_label=Label(user_ball_frame,text="You are Bowling", font=('Times New Roman', 15,'bold'))
+    you_are_balling_label=Label(user_ball_frame,text="You are Bowling", font=('Times New Roman', 18))
     you_are_balling_label.grid(row=3, column=0, columnspan=5, padx=10, pady=20)
 
-    ball_val_label=Label(user_ball_frame,text="YOU",font=('Times New Roman', 13))
+    ball_val_label=Label(user_ball_frame,text="YOU",font=('Times New Roman', 14))
     ball_val_label.grid(row=4, column=1, padx=10, pady=4)
 
-    ball_val_text=Text(user_ball_frame,state=DISABLED,height=1,width=5)
+    ball_val_text=Text(user_ball_frame,state=DISABLED,height=1,width=5, font=('Times New Roman', 12))
     ball_val_text.grid(row=5, column=1, padx=10 ,pady=4)
 
     #------------------------bowling score text---------------#        
 
-    bat_val_label=Label(user_ball_frame,text="BOT",font=('Times New Roman', 13))
+    bat_val_label=Label(user_ball_frame,text="BOT",font=('Times New Roman', 14))
     bat_val_label.grid(row=4, column=3, padx=10, pady=4)
 
-    bat_val_text=Text(user_ball_frame,state=DISABLED,height=1,width=5)
+    bat_val_text=Text(user_ball_frame,state=DISABLED,height=1,width=5, font=('Times New Roman', 12))
     bat_val_text.grid(row=5, column=3, padx=10 ,pady=4)
 
     #------buttons---------------#      
-    button_0 = Button(user_ball_frame, text="0", command=lambda:ball(0),padx=10)
+    button_0 = Button(user_ball_frame, text="0", command=lambda:ball(0),padx=10, font=('Times New Roman', 14))
     button_0.grid(row=7, column=2, padx=10, pady=10 )
 
-    button_1 = Button(user_ball_frame, text="1", command=lambda:ball(1),padx=10)
+    button_1 = Button(user_ball_frame, text="1", command=lambda:ball(1),padx=10, font=('Times New Roman', 14))
     button_1.grid(row=8, column=1, padx=10, pady=10 )
 
-    button_2 = Button(user_ball_frame, text="2", command=lambda:ball(2),padx=10)
+    button_2 = Button(user_ball_frame, text="2", command=lambda:ball(2),padx=10, font=('Times New Roman', 14))
     button_2.grid(row=8, column=2, padx=10, pady=10 )
     
-    button_3 = Button(user_ball_frame, text="3", command=lambda:ball(3),padx=10)
+    button_3 = Button(user_ball_frame, text="3", command=lambda:ball(3),padx=10, font=('Times New Roman', 14))
     button_3.grid(row=8, column=3, padx=10, pady=10 )
         
-    button_4 = Button(user_ball_frame, text="4", command=lambda:ball(4),padx=10)
+    button_4 = Button(user_ball_frame, text="4", command=lambda:ball(4),padx=10, font=('Times New Roman', 14))
     button_4.grid(row=9, column=1, padx=10, pady=10 )
 
-    button_5 = Button(user_ball_frame, text="5", command=lambda:ball(5),padx=10)
+    button_5 = Button(user_ball_frame, text="5", command=lambda:ball(5),padx=10, font=('Times New Roman', 14))
     button_5.grid(row=9, column=2, padx=10, pady=10 )
 
-    button_6 = Button(user_ball_frame, text="6", command=lambda:ball(6),padx=10)
+    button_6 = Button(user_ball_frame, text="6", command=lambda:ball(6),padx=10, font=('Times New Roman', 14))
     button_6.grid(row=9, column=3, padx=10, pady=10 )
     
 
@@ -327,7 +327,10 @@ def user_ball():
 user_bat_ball_count=1
 user_bat_wicket_count=0
 def user_bat():
+
     global user_bat_frame
+    target_run=dict["runs"]["bot"] + 1
+    dict["target_run"]["user"]=target_run
     
     def runs(bat_value):
 
@@ -336,10 +339,7 @@ def user_bat():
         total_balls=over*6+1
         total_wicket=dict["wicket"]
         total_runs=dict["runs"]["user"]
-        target_run=dict["runs"]["bot"] + 1
-        wicket=0
 
-        
         user_bat_ball_count += 1#------------ball_counting--------------#
 
         balls_left=total_balls - user_bat_ball_count
@@ -359,19 +359,15 @@ def user_bat():
         ball_val_text.delete('1.0',END)
         ball_val_text.insert(END,ball_val)
         ball_val_text.configure(state=DISABLED)
-                
-        print("bat ----",bat_value)
-        print("bal------",ball_val)
 
 
         if bat_value==ball_val: #------------------------wicket -------------------------#
-            print(wicket)
             
             user_bat_wicket_count +=1     #-------------wicket count-------------#
             wicket_left=total_wicket - user_bat_wicket_count
 
             wicket_gone_label=Label(user_bat_frame, text=f"Wicket No. - {user_bat_wicket_count}", fg="red",font=('Times New Roman', 12))
-            wicket_gone_label.grid(row=12, column=0, columnspan=5, padx=10, pady=20)
+            wicket_gone_label.grid(row=12, column=0, columnspan=5, padx=10, pady=10)
 
             wicket_count_text.configure(state=NORMAL)
             wicket_count_text.delete('1.0',END)
@@ -391,10 +387,10 @@ def user_bat():
                 if dict["toss"]["user"]=="bat":
 
                     wicket_full_gone_label=Label(user_bat_frame, text=f"Your Batting is over, Your total Score is {total_runs} \nbot need to chasse",fg="red", font=('Times New Roman', 15))
-                    wicket_full_gone_label.grid(row=13, column=0, columnspan=5, padx=10, pady=20)
+                    wicket_full_gone_label.grid(row=13, column=0, columnspan=5, padx=10, pady=10)
 
-                    batting_over_next_button=Button(user_bat_frame,text="Next",command=user_ball)
-                    batting_over_next_button.grid(row=14, column=0, columnspan=5, padx=10, pady=20)
+                    batting_over_next_button=Button(user_bat_frame,text="Next",command=user_ball, font=('Times New Roman', 15))
+                    batting_over_next_button.grid(row=14, column=0, columnspan=5, padx=10, pady=15)
 
                 elif dict["toss"]["user"]=="ball":
 
@@ -417,8 +413,6 @@ def user_bat():
             ball_val_text.delete('1.0',END)
             ball_val_text.configure(state=DISABLED)
 
-
-
             button_0.config(state=DISABLED)
             button_1.config(state=DISABLED)
             button_2.config(state=DISABLED)
@@ -430,47 +424,41 @@ def user_bat():
             if dict["toss"]["user"]=="bat":
 
                 over_completed_label=Label(user_bat_frame, text=f"Your Batting is over, Your total Score is {total_runs} \nbot need to chasse ",fg="red", font=('Times New Roman', 15))
-                over_completed_label.grid(row=12, column=0, columnspan=5, padx=10, pady=20)
+                over_completed_label.grid(row=12, column=0, columnspan=5, padx=10, pady=10)
 
-                batting_over_next_button=Button(user_bat_frame,text="Next",command=user_ball)
-                batting_over_next_button.grid(row=14, column=0, columnspan=5, padx=10, pady=20)
+                batting_over_next_button=Button(user_bat_frame,text="Next",command=user_ball, font=('Times New Roman', 15))
+                batting_over_next_button.grid(row=14, column=0, columnspan=5, padx=10, pady=15)
 
             elif dict["toss"]["user"]=="ball":
 
                 win_decision()
 
-
-
         else:
             if bat_value==0:
                 bat_value=ball_val
             total_runs += bat_value
-            print(total_runs)
 
             your_score_text.configure(state=NORMAL)  #-------- Your total score ---------#
             your_score_text.delete('1.0',END)
             your_score_text.insert(END,total_runs) 
             your_score_text.configure(state=DISABLED)
 
-            print("score = ",total_runs)
-            print()
             dict["runs"]["user"]=total_runs
+
             if dict["toss"]["user"]=="ball":
-                target_run=target_run-bat_value
-                print("Target ",target_run)
-                if target_run<=0:
+                dict["target_run"]["user"] -= bat_value
+                if dict["target_run"]["user"] <= 0:
                     win_decision()
-    
     
     user_bat_frame = main_frame()
     user_bat_frame.grid(row=1,column=0, columnspan=5, padx=10, pady=10) 
 
   #------------- your score text -----------------------#
 
-    your_score_label=Label(user_bat_frame, text="Your score", font=('Times New Roman', 12))
+    your_score_label=Label(user_bat_frame, text="Your score", font=('Times New Roman', 14))
     your_score_label.grid(row=1, column=0, padx=10)
 
-    your_score_text=Text(user_bat_frame,state=DISABLED,height=1,width=5)
+    your_score_text=Text(user_bat_frame,state=DISABLED,height=1,width=6, font=('Times New Roman', 12))
     your_score_text.grid(row=2,column=0)
     
     #-----------------Target score text -------------------------#
@@ -478,10 +466,10 @@ def user_bat():
     if dict["toss"]["user"]=="ball":
         target_run=dict["runs"]["bot"] + 1
 
-        user_bat_target_label=Label(user_bat_frame, text="Target", font=('Times New Roman', 12))
+        user_bat_target_label=Label(user_bat_frame, text="Target", font=('Times New Roman', 14))
         user_bat_target_label.grid(row=1, column=4, padx=10)
 
-        user_bat_target_text=Text(user_bat_frame,state=DISABLED,height=1,width=5)
+        user_bat_target_text=Text(user_bat_frame,state=DISABLED,height=1,width=6, font=('Times New Roman', 12))
         user_bat_target_text.grid(row=2,column=4)
 
         user_bat_target_text.configure(state=NORMAL)
@@ -495,10 +483,10 @@ def user_bat():
     over=dict["over"]
     total_balls=over*6
 
-    user_ball_count_label=Label(user_bat_frame,text="Balls left")
+    user_ball_count_label=Label(user_bat_frame,text="Balls left", font=('Times New Roman', 14))
     user_ball_count_label.grid(row=10, column=0, padx=10, pady=10)
 
-    user_ball_count_text=Text(user_bat_frame,state=DISABLED, height=1, width=5)
+    user_ball_count_text=Text(user_bat_frame,state=DISABLED, height=1, width=6, font=('Times New Roman', 12))
     user_ball_count_text.grid(row=11, column=0)
 
     user_ball_count_text.configure(state=NORMAL)
@@ -511,10 +499,10 @@ def user_bat():
 
     total_wicket=dict["wicket"]
 
-    wicket_count_label=Label(user_bat_frame,text="Wickets left")
+    wicket_count_label=Label(user_bat_frame,text="Wickets left",font=('Times New Roman', 14))
     wicket_count_label.grid(row=10, column=4, padx=10, pady=10)
 
-    wicket_count_text=Text(user_bat_frame,state=DISABLED, height=1, width=5)
+    wicket_count_text=Text(user_bat_frame,state=DISABLED, height=1, width=6, font=('Times New Roman', 12))
     wicket_count_text.grid(row=11, column=4)
 
     wicket_count_text.configure(state=NORMAL)
@@ -524,43 +512,43 @@ def user_bat():
 
     #-------------------batting score text --------------------#
 
-    you_are_batting_label=Label(user_bat_frame,text="You are Batting", font=('Times New Roman', 15,'bold'))
+    you_are_batting_label=Label(user_bat_frame,text="You are Batting", font=('Times New Roman', 18))
     you_are_batting_label.grid(row=3, column=0, columnspan=5, padx=10, pady=20)
 
-    bat_val_label=Label(user_bat_frame,text="YOU",font=('Times New Roman', 13))
+    bat_val_label=Label(user_bat_frame,text="YOU",font=('Times New Roman', 14))
     bat_val_label.grid(row=4, column=1, padx=10, pady=4)
 
-    bat_val_text=Text(user_bat_frame,state=DISABLED,height=1,width=5)
+    bat_val_text=Text(user_bat_frame,state=DISABLED,height=1,width=5, font=('Times New Roman', 12))
     bat_val_text.grid(row=5, column=1, padx=10 ,pady=4)
 
     #------------------------bowling score text---------------#        
 
-    ball_val_label=Label(user_bat_frame,text="BOT",font=('Times New Roman', 13))
+    ball_val_label=Label(user_bat_frame,text="BOT",font=('Times New Roman', 14))
     ball_val_label.grid(row=4, column=3, padx=10, pady=4)
 
-    ball_val_text=Text(user_bat_frame,state=DISABLED,height=1,width=5)
+    ball_val_text=Text(user_bat_frame,state=DISABLED,height=1,width=5, font=('Times New Roman', 12))
     ball_val_text.grid(row=5, column=3, padx=10 ,pady=4)
 
     #------buttons---------------#      
-    button_0 = Button(user_bat_frame, text="0", command=lambda:runs(0),padx=10)
+    button_0 = Button(user_bat_frame, text="0", command=lambda:runs(0),padx=10, font=('Times New Roman', 14))
     button_0.grid(row=7, column=2, padx=10, pady=10 )
 
-    button_1 = Button(user_bat_frame, text="1", command=lambda:runs(1),padx=10)
+    button_1 = Button(user_bat_frame, text="1", command=lambda:runs(1),padx=10, font=('Times New Roman', 14))
     button_1.grid(row=8, column=1, padx=10, pady=10 )
 
-    button_2 = Button(user_bat_frame, text="2", command=lambda:runs(2),padx=10)
+    button_2 = Button(user_bat_frame, text="2", command=lambda:runs(2),padx=10, font=('Times New Roman', 14))
     button_2.grid(row=8, column=2, padx=10, pady=10 )
     
-    button_3 = Button(user_bat_frame, text="3", command=lambda:runs(3),padx=10)
+    button_3 = Button(user_bat_frame, text="3", command=lambda:runs(3),padx=10,font=('Times New Roman', 14))
     button_3.grid(row=8, column=3, padx=10, pady=10 )
         
-    button_4 = Button(user_bat_frame, text="4", command=lambda:runs(4),padx=10)
+    button_4 = Button(user_bat_frame, text="4", command=lambda:runs(4),padx=10, font=('Times New Roman', 14))
     button_4.grid(row=9, column=1, padx=10, pady=10 )
 
-    button_5 = Button(user_bat_frame, text="5", command=lambda:runs(5),padx=10)
+    button_5 = Button(user_bat_frame, text="5", command=lambda:runs(5),padx=10, font=('Times New Roman', 14))
     button_5.grid(row=9, column=2, padx=10, pady=10 )
 
-    button_6 = Button(user_bat_frame, text="6", command=lambda:runs(6),padx=10)
+    button_6 = Button(user_bat_frame, text="6", command=lambda:runs(6),padx=10, font=('Times New Roman', 14))
     button_6.grid(row=9, column=3, padx=10, pady=10 )
 
 
@@ -568,16 +556,14 @@ def match(choice):
     if choice == "batting":
         dict["toss"]["user"]="bat"
         dict["toss"]["bot"]="ball"
-        print("user win the Toss and choose batting ")
+
     else:
         dict["toss"]["user"]="ball"
         dict["toss"]["bot"]="bat"
-        print("user win the Toss and choose balling")
-    print(dict)
+
     if dict["toss"]["user"]=="bat":
         user_bat()
         
-
     if dict["toss"]["user"]== "ball":
         user_ball()
         
@@ -600,27 +586,21 @@ def bat_ball_choose():
 
     else:
         bot_bat_ball_choice=random.randint(0,1)
-        print(f"bot put {bot_bat_ball_choice}")  
+
         if bot_bat_ball_choice==0:
             bot_choice_label=Label(bat_ball_choose_frame, text="bot choose batting and you have to ball", font=('Times New Roman', 18))
             bot_choice_label.grid(row=1, column=0, padx=10, pady=10)
 
-            bat_ball_choosed_next=Button(bat_ball_choose_frame, text="Next",command=lambda:match("bowling"), font=('Times New Roman', 15))
+            bat_ball_choosed_next=Button(bat_ball_choose_frame, text="Next",command=lambda:match("bowling"), font=('Times New Roman', 17))
             bat_ball_choosed_next.grid(row=2, column=0, padx=10, pady=10, columnspan=2)
-
-            print("bot win the Toss and choose batting and you have to ball")
                     
         elif bot_bat_ball_choice==1:
 
             bot_choice_label=Label(bat_ball_choose_frame, text="bot choose bowling and you have to bat" ,font=('Times New Roman', 18))
             bot_choice_label.grid(row=1, column=0, padx=10,pady=10)
 
-            bat_ball_choosed_next=Button(bat_ball_choose_frame, text="Next",command=lambda:match("batting"), font=('Times New Roman', 15))
+            bat_ball_choosed_next=Button(bat_ball_choose_frame, text="Next",command=lambda:match("batting"), font=('Times New Roman', 17))
             bat_ball_choosed_next.grid(row=2, column=0, padx=10, pady=10, columnspan=2)
-
-            print("bot win the toss and choose balling and you have to bat")
-
-            
 
 def toss_time(user_tossing):
 
@@ -628,7 +608,6 @@ def toss_time(user_tossing):
     toss_time_frame.grid(row=1,column=0,columnspan=2,padx=10,pady=10)
 
     bot_tossing=random.randint(1,6)
-    print(bot_tossing)
     total=user_tossing+bot_tossing
 
     toss_time_label=Label(toss_time_frame,text=f"You put {user_tossing} and Bot put {bot_tossing},",font=('Times New Roman', 18))
@@ -636,7 +615,6 @@ def toss_time(user_tossing):
 
     if total & 1==0:
         for key,value in dict["toss_choose"].items():
-                            
             if value=="even":
                 dict["toss_win"][key]=1
                 toss_result_label=Label(toss_time_frame,text=f"it is Even and {key} Won the Toss",font=('Times New Roman', 15))
@@ -644,7 +622,6 @@ def toss_time(user_tossing):
 
     else:
         for key,value in dict["toss_choose"].items():
-                            
             if value=="odd":
                 dict["toss_win"][key]=1
                 toss_result_label=Label(toss_time_frame,text=f"it is Odd and {key} Won the Toss",font=('Times New Roman', 15))
